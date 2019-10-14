@@ -1,0 +1,39 @@
+{
+  "name": "audio-file-normalize",
+  "version": "1.0.0",
+  "description": "The purpose of this tool that runs in Node.js is to normalize the volume of the audio files that the user wishes to process.",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "lint:fix": "eslint --fix ./src",
+    "test": "echo 'testing...'"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/megabass00/audio-file-normalize.git"
+  },
+  "keywords": [
+    "normalize",
+    "volume",
+    "javascript",
+    "node",
+    "lame",
+    "audio"
+  ],
+  "author": "megabass00",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/megabass00/audio-file-normalize/issues"
+  },
+  "homepage": "https://github.com/megabass00/audio-file-normalize#readme",
+  "dependencies": {
+    "colors": "^1.4.0",
+    "lame": "^1.2.4",
+    "pcm-volume": "^1.0.0",
+    "speaker": "^0.4.2"
+  },
+  "devDependencies": {
+    "eslint": "^6.5.1",
+    "prettier": "^1.18.2"
+  }
+}
