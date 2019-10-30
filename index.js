@@ -137,7 +137,7 @@ switch (args[0]) {
       audioModifier.error(
         'Invalid Parameter'.bgRed,
         'You must enter a valid effect:'.red +
-          '(reverb | echo | chorus | flanger | distort | lowpass | highpass | bendup | benddown | reverse)'.bgYellow
+          '(reverb | echo | chorus | flanger | distort | reverse | lowpass | highpass | bendup | benddown)'.bgYellow
             .black,
       );
       return;
