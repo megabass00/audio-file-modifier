@@ -13,12 +13,20 @@
     "url": "git+https://github.com/megabass00/audio-file-normalize.git"
   },
   "keywords": [
+    "audio process",
+    "effect",
+    "reverb",
+    "echo",
+    "chorus",
+    "flanger",
     "normalize",
     "volume",
     "javascript",
     "node",
     "lame",
-    "audio"
+    "audio",
+    "ffmpeg",
+    "sox"
   ],
   "author": "megabass00",
   "license": "ISC",
@@ -27,9 +35,17 @@
   },
   "homepage": "https://github.com/megabass00/audio-file-normalize#readme",
   "dependencies": {
+    "@ffmpeg-installer/ffmpeg": "^1.0.20",
     "colors": "^1.4.0",
+    "ffmpeg-device-list-parser": "^0.1.0",
+    "ffmpeg-normalize": "^1.8.0",
+    "fluent-ffmpeg": "^2.1.2",
     "lame": "^1.2.4",
+    "mic": "^2.1.2",
+    "music-metadata": "^4.8.2",
+    "path": "^0.12.7",
     "pcm-volume": "^1.0.0",
+    "sox-stream": "^2.0.3",
     "speaker": "^0.4.2"
   },
   "devDependencies": {
