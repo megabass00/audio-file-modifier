@@ -11,7 +11,7 @@ const util = require('util');
 const ffmpegPath = require('@ffmpeg-installer/ffmpeg').path;
 const ffmpeg = require('fluent-ffmpeg');
 ffmpeg.setFfmpegPath(ffmpegPath);
-const normalize = require('ffmpeg-normalize');
+// const normalize = require('ffmpeg-normalize');
 const Sox = require('sox-stream');
 
 /**
@@ -68,21 +68,55 @@ module.exports = class AudioFileNormalize {
     this.info('Normalizing volume on '.yellow + this._urlParts(inFile).base.green);
     await this.printFileInfo(inFile);
 
-    normalize({
-      input: inFile,
-      output: this.config.outFile,
-      loudness: {
-        normalization: 'ebuR128',
-        target: {
-          input_i: -23,
-          input_lra: 7.0,
-          input_tp: -2.0,
-        },
-      },
-      verbose: this.config.verbose,
-    })
-      .then(normalized => this.log(`File normalized ${normalized ? 'OK'.green : 'Error'.red}`))
-      .catch(error => this.error('Error while normalizing', error));
+    const getMaxDbFromText = output => {
+      const regexp = /(max_volume: -*\d*\.\d* dB)/;
+      const match = regexp.exec(output);
+      let result = match && match.length > 0 ? match[0].replace('max_volume: ', '') : '0.0 dB';
+      // this.info('MATCH', match);
+      // this.info('RESULT', result);
+      result = result.replace(' ', '');
+      return result;
+    };
+
+    ffmpeg(inFile)
+      .withAudioFilter('volumedetect')
+      .addOption('-f', 'null')
+      .on('start', commandLine => this.log('FFmpeg Command:' + commandLine))
+      .on('error', (err, stdout, stderr) => this.log('An error occurred: ' + err.message))
+      .on('end', (stdout, stderr) => {
+        const maxVolume = getMaxDbFromText(stderr);
+        if (maxVolume == '0.0dB') {
+          this.info('Now volume is 0.0 dB'.green, 'it is not necessary file normalization'.yellow);
+          return;
+        }
+
+        const newVolume = maxVolume.replace('-', '');
+        this.info('Audio normalization to'.yellow, newVolume.green);
+
+        // ffmpeg -i INPUT.mp3 -af "volume=10.7dB" -strict -2 INPUT_NORMALIZED.mp3
+        ffmpeg(inFile)
+          .withAudioFilter('volume=' + newVolume)
+          .output(this.config.outFile)
+          .on('end', () => this.log('Finished normalization'.cyan))
+          .run();
+      })
+      .saveToFile('/dev/null');
+
+    // normalize({
+    //   input: inFile,
+    //   output: this.config.outFile,
+    //   loudness: {
+    //     normalization: 'ebuR128',
+    //     target: {
+    //       input_i: -23,
+    //       input_lra: 7.0,
+    //       input_tp: -2.0,
+    //     },
+    //   },
+    //   verbose: this.config.verbose,
+    // })
+    //   .then(normalized => this.log(`File normalized ${normalized ? 'OK'.green : 'Error'.red}`))
+    //   .catch(error => this.error('Error while normalizing', error));
   }
 
   async changeFileVolume(pathToFile, outVolume) {
