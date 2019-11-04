@@ -97,7 +97,7 @@ module.exports = class AudioFileNormalize {
         ffmpeg(inFile)
           .withAudioFilter('volume=' + newVolume)
           .output(this.config.outFile)
-          .on('end', () => this.log('Finished normalization'.cyan))
+          .on('end', () => this.info('Finished normalization'.cyan))
           .run();
       })
       .saveToFile('/dev/null');
@@ -156,7 +156,7 @@ module.exports = class AudioFileNormalize {
       .audioFilters('volume=0.2')
       .audioFilters('silencedetect=n=-50dB:d=5')
       .output(this.config.outFile)
-      .on('end', () => this.log('Finished splitting'.cyan))
+      .on('end', () => this.info('Finished splitting'.cyan))
       .run();
   }
 
@@ -183,7 +183,7 @@ module.exports = class AudioFileNormalize {
       // .audioFilters(`atempo=${pitchTempo}`)
       .audioFilters(`aresample=${originalRate}`)
       .output(this.config.outFile)
-      .on('end', () => this.log('Finished pitching'.cyan))
+      .on('end', () => this.info('Finished pitching'.cyan))
       .run();
   }
 
@@ -210,7 +210,7 @@ module.exports = class AudioFileNormalize {
       .audioFilters(`afade=in:st=0:d=${fadeIn}`)
       .audioFilters(`afade=out:st=${audioFileDuration - fadeOut}:d=${fadeOut}`)
       .output(this.config.outFile)
-      .on('end', () => this.log('Finished fading'.cyan))
+      .on('end', () => this.info('Finished fading'.cyan))
       .run();
   }
 
