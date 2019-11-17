@@ -42,6 +42,7 @@ You can use the tool with several options to modify behaviour:
 
 - **inFile**: input file path (you must enter a valid audio file path)
 - **outFile**: output file path
+- **overwrite**: input file will be overwritted
 - **volume**: output final volume
 - **sampleRate**: output sample rate
 - **channels**: output number channels
