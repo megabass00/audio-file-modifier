@@ -7,9 +7,24 @@ const getParam = (param, defaultVal = '') => {
   return paramValue;
 };
 
+const normalizeFolder = async folderPath => {
+  const fs = require('fs');
+  if (folderPath.substring(folderPath.length - 1) != '/' || folderPath.substring(folderPath.length - 1) != '\\') folderPath += '/';
+  console.log('Normalizing folder', folderPath);
+  
+  audioModifier.config.overwrite = true;
+  const files = fs.readdirSync(folderPath);
+  for(let i=0; i<files.length; i++) {
+    if (files[i].includes('mp3')) 
+        await audioModifier.normalizeFile(folderPath + files[i])
+  }
+  console.log('End of normalization!!!');
+}
+
 const AudioFileModifier = require('./AudioFileModifier');
 
 const outFile = getParam('outFile', 'example.mp3');
+const overwrite = getParam('overwrite', false);
 const volume = getParam('volume', 1.0);
 const sampleRate = getParam('sampleRate', 44100);
 const channels = getParam('channels', 2);
@@ -22,6 +37,7 @@ const verbose = getParam('verbose', false);
 
 const audioModifier = new AudioFileModifier({
   outFile,
+  overwrite,
   volume,
   sampleRate,
   channels,
@@ -143,6 +159,18 @@ switch (args[0]) {
       return;
     }
     audioModifier.applyEffect(args[1], args[2]);
+    break;
+
+  case 'normalizeFolder':
+    if (!args[1]) {
+      audioModifier.error('Invalid Parameter'.bgRed, 'You must enter a valid local path folder'.red);
+      return;
+    }
+    if (!require('fs').existsSync(args[1])) {
+      audioModifier.error('Invalid Folder Path'.bgRed, 'You must enter a valid local path folder'.red);
+      return;
+    }
+    normalizeFolder(args[1])
     break;
 
   default:

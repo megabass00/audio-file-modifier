@@ -46,7 +46,8 @@
     "path": "^0.12.7",
     "pcm-volume": "^1.0.0",
     "sox-stream": "^2.0.3",
-    "speaker": "^0.4.2"
+    "speaker": "^0.4.2",
+    "tmp": "^0.1.0"
   },
   "devDependencies": {
     "eslint": "^6.5.1",

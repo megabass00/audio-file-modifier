@@ -7,17 +7,18 @@ const fs = require('fs');
 const PcmVolume = require('pcm-volume');
 const mm = require('music-metadata');
 const util = require('util');
+const tmp = require('tmp');
 
+const Sox = require('sox-stream');
 const ffmpegPath = require('@ffmpeg-installer/ffmpeg').path;
 const ffmpeg = require('fluent-ffmpeg');
 ffmpeg.setFfmpegPath(ffmpegPath);
-// const normalize = require('ffmpeg-normalize');
-const Sox = require('sox-stream');
 
 /**
  *  You can pass several options to constructor:
  *    inFile (string):        input file path (you must enter a valid audio file path)
  *    outFile (string):       output file path
+ *    overwrite (boolean):    input file will be overwritted
  *    volume (integer):       output final volume
  *    sampleRate (integer):   output sample rate
  *    channels (integer):     output number channels
@@ -64,7 +65,9 @@ module.exports = class AudioFileNormalize {
   }
 
   async normalizeFile(pathToFile) {
+    this.config.inFile = pathToFile;
     const inFile = pathToFile || this.config.inFile;
+    const outFile = this.getOutFile();
     this.info('Normalizing volume on '.yellow + this._urlParts(inFile).base.green);
     await this.printFileInfo(inFile);
 
@@ -78,45 +81,45 @@ module.exports = class AudioFileNormalize {
       return result;
     };
 
-    ffmpeg(inFile)
-      .withAudioFilter('volumedetect')
-      .addOption('-f', 'null')
-      .on('start', commandLine => this.log('FFmpeg Command:' + commandLine))
-      .on('error', (err, stdout, stderr) => this.log('An error occurred: ' + err.message))
-      .on('end', (stdout, stderr) => {
-        const maxVolume = getMaxDbFromText(stderr);
-        if (maxVolume == '0.0dB') {
-          this.info('Now volume is 0.0 dB'.green, 'it is not necessary file normalization'.yellow);
-          return;
-        }
+    const promise = new Promise((resolve, reject) => {
+      ffmpeg(inFile)
+        .withAudioFilter('volumedetect')
+        .addOption('-f', 'null')
+        .on('start', commandLine => this.log('FFmpeg Command:' + commandLine))
+        .on('error', (err, stdout, stderr) => {
+          this.log('An error occurred: ' + err.message);
+          reject();
+        })
+        .on('end', (stdout, stderr) => {
+          const maxVolume = getMaxDbFromText(stderr);
+          if (maxVolume == '0.0dB') {
+            this.info('Now volume is 0.0 dB'.green, 'it is not necessary file normalization'.yellow);
+            resolve();
+          }
 
-        const newVolume = maxVolume.replace('-', '');
-        this.info('Audio normalization to'.yellow, newVolume.green);
+          const newVolume = maxVolume.replace('-', '');
+          this.info('Audio normalization to'.yellow, newVolume.green);
+          // this.info('OUT'.bgCyan, outFile);
 
-        // ffmpeg -i INPUT.mp3 -af "volume=10.7dB" -strict -2 INPUT_NORMALIZED.mp3
-        ffmpeg(inFile)
-          .withAudioFilter('volume=' + newVolume)
-          .output(this.config.outFile)
-          .on('end', () => this.info('Finished normalization'.cyan))
-          .run();
-      })
-      .saveToFile('/dev/null');
-
-    // normalize({
-    //   input: inFile,
-    //   output: this.config.outFile,
-    //   loudness: {
-    //     normalization: 'ebuR128',
-    //     target: {
-    //       input_i: -23,
-    //       input_lra: 7.0,
-    //       input_tp: -2.0,
-    //     },
-    //   },
-    //   verbose: this.config.verbose,
-    // })
-    //   .then(normalized => this.log(`File normalized ${normalized ? 'OK'.green : 'Error'.red}`))
-    //   .catch(error => this.error('Error while normalizing', error));
+          // ffmpeg -i INPUT.mp3 -af "volume=10.7dB" -strict -2 INPUT_NORMALIZED.mp3
+          ffmpeg(inFile)
+            .withAudioFilter('volume=' + newVolume)
+            .output(outFile)
+            .on('end', () => {
+              if (this.config.overwrite) {
+                fs.copyFile(outFile, this.config.inFile, err => {
+                  if (err) throw err;
+                  this.config.tmpFile.removeCallback();
+                })
+              }
+              resolve();
+            })
+            .run();
+        })
+        .saveToFile('/dev/null');
+    });
+    
+    return await promise.then(() => this.info('Finished normalization'.cyan));
   }
 
   async changeFileVolume(pathToFile, outVolume) {
@@ -404,6 +407,7 @@ module.exports = class AudioFileNormalize {
     /**
      *    inFile (string):        input file path (you must enter a valid audio file path)
      *    outFile (string):       output file path
+     *    overwrite (boolean):    input file will be overwritted
      *    volume (integer):       output final volume
      *    sampleRate (integer):   output sample rate
      *    channels (integer):     output number channels
@@ -415,7 +419,7 @@ module.exports = class AudioFileNormalize {
      *    verbose (boolean):      it will show or not logs by console (default is true)
      *    mode (auto):            this option will be calculated based on number of channels
      */
-    const { inFile, outFile, volume, sampleRate, channels, pitch, fade, fadeIn, fadeOut, recTime, verbose } = options;
+    const { inFile, overwrite, outFile, volume, sampleRate, channels, pitch, fade, fadeIn, fadeOut, recTime, verbose } = options;
     const inFilePath = inFile && fs.existsSync(inFile) ? inFile : false;
     const outFileName = outFile || 'output.mp3';
     const outFilePath = outFileName.indexOf('/') > -1 ? outFileName : path.resolve(__dirname, 'processed', outFileName);
@@ -423,6 +427,7 @@ module.exports = class AudioFileNormalize {
     return {
       inFile: inFilePath,
       outFile: outFilePath,
+      overwrite: overwrite || false,
       volume: volume || 1.0,
       sampleRate: sampleRate || 44100,
       channels: numChannels,
@@ -535,6 +540,16 @@ module.exports = class AudioFileNormalize {
     // ext: '.txt',
     // name: 'file'
     return path.parse(pathToFile);
+  }
+
+  getOutFile() {
+    if (this.config.overwrite) {
+      this.config.tmpFile = tmp.fileSync();
+      const tmpName = this.config.tmpFile.name + '.mp3'
+      this.info('Using temp file'.yellow, tmpName);
+      return tmpName;
+    }
+    return this.config.outFile;
   }
 
   // VERBOSE //
