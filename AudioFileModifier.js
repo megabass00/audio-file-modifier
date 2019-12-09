@@ -450,19 +450,23 @@ module.exports = class AudioFileNormalize {
   }
 
   async getSampleRate(pathToFile) {
-    return (await this.getMetadata(pathToFile)).format.sampleRate.toPrecision();
+    const metadata = await this.getMetadata(pathToFile);
+    return metadata.format.sampleRate ? metadata.format.sampleRate.toPrecision() : 0;
   }
 
   async getBitRate(pathToFile) {
-    return (await this.getMetadata(pathToFile)).format.bitrate.toPrecision() / 1024;
+    const metadata = await this.getMetadata(pathToFile);
+    return metadata.format.bitrate ? metadata.format.bitrate.toPrecision() / 1024 : 0;
   }
 
   async getDuration(pathToFile) {
-    return (await this.getMetadata(pathToFile)).format.duration.toPrecision();
+    const metadata = await this.getMetadata(pathToFile);
+    return metadata.format.duration ? metadata.format.duration.toPrecision() : 0;
   }
 
   async getNumberOfChannels(pathToFile) {
-    return (await this.getMetadata(pathToFile)).format.numberOfChannels.toPrecision();
+    const metadata = await this.getMetadata(pathToFile);
+    return metadata.format.numberOfChannels ? metadata.format.numberOfChannels.toPrecision() : 1;
   }
 
   async getMetadata(pathToFile) {
