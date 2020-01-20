@@ -9,19 +9,19 @@ const getParam = (param, defaultVal = '') => {
 
 const normalizeFolder = async folderPath => {
   const fs = require('fs');
-  if (folderPath.substring(folderPath.length - 1) != '/' || folderPath.substring(folderPath.length - 1) != '\\') folderPath += '/';
+  if (folderPath.substring(folderPath.length - 1) != '/' || folderPath.substring(folderPath.length - 1) != '\\')
+    folderPath += '/';
   console.log('Normalizing folder', folderPath);
-  
+
   audioModifier.config.overwrite = true;
   const files = fs.readdirSync(folderPath);
-  for(let i=0; i<files.length; i++) {
-    if (files[i].includes('mp3')) 
-        await audioModifier.normalizeFile(folderPath + files[i])
+  for (let i = 0; i < files.length; i++) {
+    if (files[i].includes('mp3')) await audioModifier.normalizeFile(folderPath + files[i]);
   }
   console.log('End of normalization!!!');
-}
+};
 
-const AudioFileModifier = require('./AudioFileModifier');
+const AudioFileModifier = require('./lib/AudioFileModifier');
 
 const outFile = getParam('outFile', 'example.mp3');
 const overwrite = getParam('overwrite', false);
@@ -170,7 +170,7 @@ switch (args[0]) {
       audioModifier.error('Invalid Folder Path'.bgRed, 'You must enter a valid local path folder'.red);
       return;
     }
-    normalizeFolder(args[1])
+    normalizeFolder(args[1]);
     break;
 
   default:
