@@ -1,6 +1,6 @@
 {
   "name": "audio-file-modifier",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "The purpose of this tool that runs in Node.js and be able to process audio files. For example this tool is able to normalize the volume of the audio files that the user wishes to process.",
   "main": "lib/AudioFileModifier.js",
   "scripts": {
@@ -41,7 +41,7 @@
     "ffmpeg-device-list-parser": "^0.1.0",
     "ffmpeg-normalize": "^1.8.0",
     "fluent-ffmpeg": "^2.1.2",
-    "lame": "^1.2.4",
+    "lame": "github:suldashi/node-lame",
     "mic": "^2.1.2",
     "path": "^0.12.7",
     "play-sound": "^1.1.3",
