@@ -41,12 +41,10 @@
     "ffmpeg-device-list-parser": "^0.1.0",
     "ffmpeg-normalize": "^1.8.0",
     "fluent-ffmpeg": "^2.1.2",
-    "lame": "github:suldashi/node-lame",
-    "mic": "^2.1.2",
     "path": "^0.12.7",
     "play-sound": "^1.1.3",
+    "progress-stream": "^2.0.0",
     "sox-stream": "^2.0.3",
-    "speaker": "^0.4.2",
     "tmp": "^0.1.0"
   },
   "devDependencies": {

@@ -34,7 +34,7 @@ Bellow you can see avaible operations you can do:
 - **pitch**: You can change pitch on any local audio file.
 - **effect**: You can apply an effect to an audio file between several types.
 - **play**: You can play any song from your local disk.
-- **record**: You can record mic built-in signal and save in a mp3 file. You need to have installed on your machine sox (Mac/Windows Users) or ALSA tools for Linux.
+- **record** (disabled): You can record mic built-in signal and save in a mp3 file. You need to have installed on your machine sox (Mac/Windows Users) or ALSA tools for Linux.
 
 # Options
 

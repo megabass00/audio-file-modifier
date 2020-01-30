@@ -33,7 +33,7 @@ const fade = getParam('fade', false);
 const fadeIn = getParam('fadeIn', false);
 const fadeOut = getParam('fadeOut', false);
 const recTime = getParam('recTime', 10);
-const verbose = getParam('verbose', false);
+const verbose = getParam('verbose', true);
 
 const audioModifier = new AudioFileModifier({
   outFile,
@@ -56,7 +56,10 @@ switch (args[0]) {
       audioModifier.log('Error:'.bgRed, 'You must enter a valid local path file'.red);
       return;
     }
-    audioModifier.normalizeFile(args[1]);
+    audioModifier
+      .normalizeFile(args[1])
+      .then(() => audioModifier.log('Finished normalization!!!'))
+      .catch(err => audioModifier.error('Error normalizing', err));
     break;
 
   case 'volume':
@@ -68,7 +71,10 @@ switch (args[0]) {
       audioModifier.error('Invalid Parameter'.bgRed, 'You must enter your output volume wished'.red);
       return;
     }
-    audioModifier.changeFileVolume(args[1], args[2]);
+    audioModifier
+      .changeFileVolume(args[1], args[2])
+      .then(() => audioModifier.log('Volume change finished!!!'))
+      .catch(err => audioModifier.error('Error normalizing', err));
     break;
 
   case 'split':
@@ -76,7 +82,10 @@ switch (args[0]) {
       audioModifier.error('Invalid Parameter'.bgRed, 'You must enter a valid local path file'.red);
       return;
     }
-    audioModifier.splitSilences(args[1]);
+    audioModifier
+      .splitSilences(args[1])
+      .then(() => audioModifier.log('Split silences finished!!!'))
+      .catch(err => audioModifier.error('Error normalizing', err));
     break;
 
   case 'pitch':
@@ -92,7 +101,10 @@ switch (args[0]) {
       audioModifier.error('Invalid Parameter'.bgRed, 'Pitch percent to change must be between 1 and 200'.red);
       return;
     }
-    audioModifier.changePitch(args[1], parseInt(args[2]));
+    audioModifier
+      .changePitch(args[1], parseInt(args[2]))
+      .then(() => audioModifier.log('Pitch shift finished!!!'))
+      .catch(err => audioModifier.error('Error normalizing', err));
     break;
 
   case 'fade':
@@ -108,7 +120,10 @@ switch (args[0]) {
       audioModifier.error('Invalid Parameter'.bgRed, 'Fade time must be between 1 and 30 seconds'.red);
       return;
     }
-    audioModifier.createFade(args[1], parseInt(args[2]));
+    audioModifier
+      .createFade(args[1], parseInt(args[2]))
+      .then(() => audioModifier.log('Make fades finished!!!'))
+      .catch(err => audioModifier.error('Error normalizing', err));
     break;
 
   case 'record':
@@ -158,7 +173,10 @@ switch (args[0]) {
       );
       return;
     }
-    audioModifier.applyEffect(args[1], args[2]);
+    audioModifier
+      .applyEffect(args[1], args[2])
+      .then(() => audioModifier.log(`${args[2].toLocaleUpperCase()} FX applied!!!`))
+      .catch(err => audioModifier.error('Error normalizing', err));
     break;
 
   case 'normalizeFolder':
