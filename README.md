@@ -63,7 +63,7 @@ npm start normalize <path-to-audio-file>
 npm start volume <path-to-audio-file> 120
 
 # remove blank parts of a local file (begin and end)
-npm start aplit <path-to-audio-file>
+npm start split <path-to-audio-file>
 
 # create fade in/out with 5 secs to both
 npm start fade <path-to-audio-file> 5
